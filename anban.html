@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="ka">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PARADISE | Board Game Space</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * { font-family: 'Inter', sans-serif; }
+        body { background-color: #0b0712; color: #e2e8f0; }
+        .glass {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .glass-card {
+            background: rgba(20, 15, 35, 0.6);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(168, 85, 247, 0.2);
+        }
+        .custom-gradient {
+            background: linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #ec4899 100%);
+        }
+        .card-hover {
+            transition: all 0.35s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+        }
+        .card-hover:hover {
+            transform: translateY(-10px) scale(1.01);
+            border-color: rgba(168, 85, 247, 0.5);
+            box-shadow: 0 25px 40px -12px rgba(168, 85, 247, 0.25);
+        }
+        .neon-text {
+            text-shadow: 0 0 20px rgba(168, 85, 247, 0.6);
+        }
+        input, select {
+            transition: all 0.2s ease;
+        }
+        input:focus, select:focus {
+            border-color: #a855f7;
+            box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.2);
+            outline: none;
+        }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #1a1428; }
+        ::-webkit-scrollbar-thumb { background: #a855f7; border-radius: 10px; }
+        .page { display: none; }
+        .page.active { display: block; }
+        .nav-link.active { color: #a855f7; }
+        .mobile-menu { transition: all 0.3s ease; }
+    </style>
+</head>
+<body class="antialiased overflow-x-hidden">
+
+    <!-- ======================== NAVBAR ======================== -->
+    <nav class="fixed w-full z-50 glass border-b border-white/5 px-4 md:px-8 py-3" id="navbar">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-3 cursor-pointer group" onclick="navigateTo('home')">
+                <div class="w-10 h-10 custom-gradient rounded-xl flex items-center justify-center shadow-lg group-hover:rotate-12 transition-transform duration-300">
+                    <i class="fas fa-chess-knight text-white text-xl"></i>
+                </div>
+                <span class="text-2xl font-black tracking-tighter text-white uppercase">Paradise</span>
+            </div>
+            
+            <div class="hidden md:flex items-center gap-8 text-sm font-semibold uppercase tracking-widest">
+                <a href="#" onclick="navigateTo('home'); return false;" class="nav-link transition-colors" data-page="home">მთავარი</a>
+                <a href="#" onclick="navigateTo('catalog'); return false;" class="nav-link transition-colors" data-page="catalog">კატალოგი</a>
+                <a href="#" onclick="navigateTo('booking'); return false;" class="nav-link transition-colors" data-page="booking">დაჯავშნა</a>
+                <a href="#" onclick="navigateTo('orders'); return false;" class="nav-link transition-colors" data-page="orders">ჩემი შეკვეთები</a>
+            </div>
+
+            <div class="flex items-center gap-4">
+                <div onclick="navigateTo('orders')" class="relative cursor-pointer">
+                    <i class="fas fa-shopping-basket text-xl text-gray-400 hover:text-white transition"></i>
+                    <span id="cartCount" class="absolute -top-2 -right-2 w-5 h-5 bg-pink-500 text-[10px] flex items-center justify-center rounded-full text-white font-bold">0</span>
+                </div>
+                <button id="menuBtn" class="md:hidden text-white text-2xl">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+        </div>
+        
+        <!-- მობილური მენიუ -->
+        <div id="mobileMenu" class="hidden md:hidden absolute top-full left-0 w-full glass border-b border-white/5 py-4 px-6 flex flex-col gap-4 mobile-menu">
+            <a href="#" onclick="navigateTo('home'); return false;" class="nav-link-mobile py-2 font-semibold" data-page="home">მთავარი</a>
+            <a href="#" onclick="navigateTo('catalog'); return false;" class="nav-link-mobile py-2 font-semibold" data-page="catalog">კატალოგი</a>
+            <a href="#" onclick="navigateTo('booking'); return false;" class="nav-link-mobile py-2 font-semibold" data-page="booking">დაჯავშნა</a>
+            <a href="#" onclick="navigateTo('orders'); return false;" class="nav-link-mobile py-2 font-semibold" data-page="orders">ჩემი შეკვეთები</a>
+        </div>
+    </nav>
+
+    <!-- ======================== PAGE: HOME ======================== -->
+    <div id="home-page" class="page active">
+        <header class="relative min-h-screen flex items-center justify-center pt-20">
+            <div class="absolute inset-0 z-0">
+                <div class="absolute inset-0 bg-gradient-to-b from-[#0b0712] via-[#0b0712]/80 to-[#0b0712]"></div>
+                <img src="https://images.unsplash.com/photo-1610813645607-438466b0a1a0?auto=format&fit=crop&q=80&w=2000" class="w-full h-full object-cover opacity-40" alt="Background">
+            </div>
+            
+            <div class="relative z-10 text-center px-6 max-w-6xl">
+                <div class="inline-flex items-center gap-2 bg-purple-500/10 border border-purple-500/20 px-5 py-2 rounded-full mb-8 animate-pulse">
+                    <span class="w-2 h-2 bg-purple-500 rounded-full animate-ping"></span>
+                    <span class="text-purple-400 text-xs font-bold uppercase tracking-widest">🔥 150+ ახალი თამაში</span>
+                </div>
+                <h1 class="text-6xl md:text-8xl font-black text-white mb-8 leading-[1.1]">
+                    ითამაშე შენს <br>
+                    <span class="text-transparent bg-clip-text custom-gradient neon-text">სამოთხეში</span>
+                </h1>
+                <p class="text-gray-300 text-lg md:text-xl max-w-2xl mx-auto mb-12 font-light leading-relaxed">
+                    დაჯავშნე მაგიდა, აირჩიე თამაში კატალოგიდან და გადაიხადე უსაფრთხოდ — ყველაფერი ერთ სივრცეში.
+                </p>
+                <div class="flex flex-col sm:flex-row gap-6 justify-center">
+                    <button onclick="navigateTo('booking')" class="custom-gradient px-10 py-5 rounded-2xl font-black text-lg text-white hover:scale-105 transition shadow-[0_10px_40px_rgba(168,85,247,0.4)]">
+                        მაგიდის დაჯავშნა
+                    </button>
+                    <button onclick="navigateTo('catalog')" class="glass px-10 py-5 rounded-2xl font-black text-lg text-white hover:bg-white/10 transition border border-white/10">
+                        თამაშების კატალოგი
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- STATS -->
+        <section class="py-16 glass border-y border-white/5">
+            <div class="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-12 text-center">
+                <div><div class="text-4xl font-black text-white mb-2">200+</div><div class="text-purple-400 text-sm uppercase font-bold">თამაში</div></div>
+                <div><div class="text-4xl font-black text-white mb-2">18</div><div class="text-purple-400 text-sm uppercase font-bold">მაგიდა</div></div>
+                <div><div class="text-4xl font-black text-white mb-2">12k+</div><div class="text-purple-400 text-sm uppercase font-bold">მოთამაშე</div></div>
+                <div><div class="text-4xl font-black text-white mb-2">4.95</div><div class="text-purple-400 text-sm uppercase font-bold">რეიტინგი</div></div>
+            </div>
+        </section>
+
+        <!-- FEATURES -->
+        <section class="py-28 px-6">
+            <div class="max-w-7xl mx-auto">
+                <h2 class="text-4xl md:text-5xl font-black text-white text-center mb-16">რატომ Paradise?</h2>
+                <div class="grid md:grid-cols-3 gap-8">
+                    <div class="glass rounded-3xl p-8 text-center card-hover transition-all border border-white/10">
+                        <div class="text-5xl mb-5">🎲</div>
+                        <h3 class="text-xl font-bold mb-3">200+ თამაში</h3>
+                        <p class="text-gray-400">კლასიკიდან უახლეს ჰიტებამდე</p>
+                    </div>
+                    <div class="glass rounded-3xl p-8 text-center card-hover transition-all border border-white/10">
+                        <div class="text-5xl mb-5">🍕</div>
+                        <h3 class="text-xl font-bold mb-3">ბარი & სნექები</h3>
+                        <p class="text-gray-400">სასმელები, ყავა, ცხელი კერძები</p>
+                    </div>
+                    <div class="glass rounded-3xl p-8 text-center card-hover transition-all border border-white/10">
+                        <div class="text-5xl mb-5">👥</div>
+                        <h3 class="text-xl font-bold mb-3">Game Masters</h3>
+                        <p class="text-gray-400">დაგეხმარებიან თამაშის წესებში</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- ======================== PAGE: CATALOG ======================== -->
+    <div id="catalog-page" class="page">
+        <section class="pt-32 pb-20 px-6">
+            <div class="max-w-7xl mx-auto">
+                <div class="text-center mb-12">
+                    <h1 class="text-4xl md:text-6xl font-black text-white mb-4">📚 თამაშების კატალოგი</h1>
+                    <p class="text-gray-400 text-lg max-w-2xl mx-auto">აირჩიე შენთვის სასურველი თამაში და შეუკვეთე ჯავშნისას</p>
+                </div>
+                
+                <div class="flex flex-wrap gap-3 justify-center mb-12" id="filterButtons">
+                    <button data-filter="all" class="filter-btn px-6 py-2 rounded-full bg-purple-600 text-white font-bold text-sm">ყველა</button>
+                    <button data-filter="strategy" class="filter-btn px-6 py-2 rounded-full glass text-gray-300 font-bold text-sm hover:bg-white/5">სტრატეგია</button>
+                    <button data-filter="family" class="filter-btn px-6 py-2 rounded-full glass text-gray-300 font-bold text-sm hover:bg-white/5">საოჯახო</button>
+                    <button data-filter="cards" class="filter-btn px-6 py-2 rounded-full glass text-gray-300 font-bold text-sm hover:bg-white/5">კარტი</button>
+                </div>
+
+                <div id="gamesGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8"></div>
+            </div>
+        </section>
+    </div>
+
+    <!-- ======================== PAGE: BOOKING ======================== -->
+    <div id="booking-page" class="page">
+        <section class="pt-32 pb-20 px-6 relative overflow-hidden">
+            <div class="absolute top-0 right-0 w-96 h-96 bg-purple-600/10 blur-[150px]"></div>
+            <div class="absolute bottom-0 left-0 w-96 h-96 bg-pink-600/10 blur-[150px]"></div>
+            
+            <div class="max-w-5xl mx-auto">
+                <div class="text-center mb-12">
+                    <h1 class="text-4xl md:text-6xl font-black text-white mb-4">🪑 მაგიდის დაჯავშნა</h1>
+                    <p class="text-gray-400 text-lg">შეავსე ფორმა, აირჩიე თარიღი და განახორციელე გადახდა</p>
+                </div>
+
+                <div class="glass-card p-8 md:p-10 rounded-[40px] border border-white/10 shadow-2xl max-w-2xl mx-auto">
+                    <form id="bookingForm" class="space-y-5">
+                        <div><label class="text-xs font-black uppercase tracking-widest text-gray-400">სრული სახელი</label><input type="text" id="fullName" required class="w-full bg-white/5 border border-white/10 p-4 rounded-2xl focus:border-purple-500 outline-none text-white"></div>
+                        <div><label class="text-xs font-black uppercase tracking-widest text-gray-400">ელ. ფოსტა</label><input type="email" id="email" required class="w-full bg-white/5 border border-white/10 p-4 rounded-2xl focus:border-purple-500 outline-none text-white"></div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div><label class="text-xs font-black uppercase tracking-widest text-gray-400">თარიღი</label><input type="date" id="date" required class="w-full bg-white/5 border border-white/10 p-4 rounded-2xl"></div>
+                            <div><label class="text-xs font-black uppercase tracking-widest text-gray-400">დრო</label><select id="time" class="w-full bg-white/5 border border-white/10 p-4 rounded-2xl"><option>14:00</option><option>16:00</option><option>18:00</option><option>20:00</option><option>22:00</option></select></div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div><label class="text-xs font-black uppercase tracking-widest text-gray-400">ხალხი</label><input type="number" id="guests" min="1" max="12" value="2" class="w-full bg-white/5 border border-white/10 p-4 rounded-2xl"></div>
+                            <div><label class="text-xs font-black uppercase tracking-widest text-gray-400">თამაში</label><select id="gameToOrder" class="w-full bg-white/5 border border-white/10 p-4 rounded-2xl text-gray-300"><option value="">აირჩიე თამაში</option></select></div>
+                        </div>
+                        
+                        <div class="border-t border-white/10 pt-5 mt-3">
+                            <h4 class="text-white font-bold mb-3">💳 გადახდის დეტალები</h4>
+                            <div class="space-y-3">
+                                <input type="text" id="cardNumber" placeholder="4242 4242 4242 4242" required class="w-full bg-white/5 border border-white/10 p-4 rounded-2xl">
+                                <div class="grid grid-cols-2 gap-3">
+                                    <input type="text" id="expiry" placeholder="MM/YY" required class="bg-white/5 border border-white/10 p-4 rounded-2xl">
+                                    <input type="text" id="cvc" placeholder="CVC" required class="bg-white/5 border border-white/10 p-4 rounded-2xl">
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="w-full py-5 custom-gradient rounded-2xl font-black text-white text-lg shadow-2xl hover:brightness-110 transition transform active:scale-95 mt-4">
+                            🎲 დაჯავშნა & გადახდა
+                        </button>
+                    </form>
+                    <div id="bookingMessage" class="mt-5 text-center text-sm font-bold"></div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- ======================== PAGE: ORDERS ======================== -->
+    <div id="orders-page" class="page">
+        <section class="pt-32 pb-20 px-6">
+            <div class="max-w-6xl mx-auto">
+                <div class="text-center mb-12">
+                    <h1 class="text-4xl md:text-6xl font-black text-white mb-4">📦 ჩემი შეკვეთები</h1>
+                    <p class="text-gray-400 text-lg">აქ ნახავ ყველა დაჯავშნილ მაგიდას და შეკვეთილ თამაშს</p>
+                </div>
+                <div id="ordersContainer" class="grid md:grid-cols-2 gap-6"></div>
+                <div class="text-center mt-10">
+                    <button onclick="navigateTo('booking')" class="custom-gradient px-8 py-4 rounded-2xl font-bold text-white hover:scale-105 transition">+ ახალი ჯავშანი</button>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- ======================== FOOTER ======================== -->
+    <footer class="pt-24 pb-10 px-6 border-t border-white/5 mt-10">
+        <div class="max-w-7xl mx-auto grid md:grid-cols-4 gap-12 mb-16">
+            <div><div class="flex items-center gap-3 mb-5"><div class="w-8 h-8 custom-gradient rounded-lg flex items-center justify-center"><i class="fas fa-chess-knight text-white"></i></div><span class="text-xl font-black uppercase">Paradise</span></div><p class="text-gray-500 text-sm">საუკეთესო სივრცე board game მოყვარულებისთვის</p></div>
+            <div><h5 class="text-white font-bold mb-5">ნავიგაცია</h5><ul class="space-y-3 text-gray-500 text-sm"><li><a href="#" onclick="navigateTo('home'); return false;" class="hover:text-purple-400">მთავარი</a></li><li><a href="#" onclick="navigateTo('catalog'); return false;" class="hover:text-purple-400">კატალოგი</a></li><li><a href="#" onclick="navigateTo('booking'); return false;" class="hover:text-purple-400">დაჯავშნა</a></li><li><a href="#" onclick="navigateTo('orders'); return false;" class="hover:text-purple-400">ჩემი შეკვეთები</a></li></ul></div>
+            <div><h5 class="text-white font-bold mb-5">კონტაქტი</h5><ul class="space-y-3 text-gray-500 text-sm"><li><i class="fas fa-envelope text-purple-400 mr-2"></i> paradise@board.ge</li><li><i class="fas fa-phone text-purple-400 mr-2"></i> +995 555 55 77 99</li><li><i class="fas fa-map-marker-alt text-purple-400 mr-2"></i> თბილისი, ვაჟა-ფშაველას 45</li></ul></div>
+            <div><h5 class="text-white font-bold mb-5">სოციალური</h5><div class="flex gap-4"><a href="#" class="w-10 h-10 glass rounded-full flex items-center justify-center hover:bg-purple-600 transition"><i class="fab fa-instagram"></i></a><a href="#" class="w-10 h-10 glass rounded-full flex items-center justify-center hover:bg-purple-600 transition"><i class="fab fa-facebook"></i></a><a href="#" class="w-10 h-10 glass rounded-full flex items-center justify-center hover:bg-purple-600 transition"><i class="fab fa-discord"></i></a></div></div>
+        </div>
+        <div class="text-center text-gray-600 text-xs border-t border-white/5 pt-8">© 2026 PARADISE BOARD GAME HUB — ყველა უფლება დაცულია</div>
+    </footer>
+
+    <script>
+        // ======================== GAMES DATABASE ========================
+        const gamesDB = [
+            { id: 1, name: "Catan: Universe", category: "strategy", players: "3-4", price: 15, image: "https://images.unsplash.com/photo-1611996575749-79a3a250f948?auto=format&fit=crop&q=80&w=600", popular: true },
+            { id: 2, name: "D&D Starter Kit", category: "strategy", players: "2-6", price: 20, image: "https://images.unsplash.com/photo-1585504198199-20277593b94f?auto=format&fit=crop&q=80&w=600", popular: false },
+            { id: 3, name: "Dixit Odyssey", category: "family", players: "3-8", price: 12, image: "https://images.unsplash.com/photo-1610890716171-6b1bb98ffd09?auto=format&fit=crop&q=80&w=600", popular: true },
+            { id: 4, name: "Uno Flip", category: "cards", players: "2-10", price: 8, image: "https://images.unsplash.com/photo-1612036782180-6f0b6cd846fe?auto=format&fit=crop&q=80&w=600", popular: false },
+            { id: 5, name: "Ticket to Ride", category: "strategy", players: "2-5", price: 18, image: "https://images.unsplash.com/photo-1633613286848-e6f43bbafb8d?auto=format&fit=crop&q=80&w=600", popular: true },
+            { id: 6, name: "Codenames", category: "family", players: "4-8", price: 10, image: "https://images.unsplash.com/photo-1610890716171-6b1bb98ffd09?auto=format&fit=crop&q=80&w=600", popular: false },
+            { id: 7, name: "Pandemic", category: "strategy", players: "2-4", price: 22, image: "https://images.unsplash.com/photo-1633613286848-e6f43bbafb8d?auto=format&fit=crop&q=80&w=600", popular: true },
+            { id: 8, name: "Chess Premium", category: "strategy", players: "2", price: 5, image: "https://images.unsplash.com/photo-1586165368502-1bad197a6461?auto=format&fit=crop&q=80&w=600", popular: false }
+        ];
+
+        let activeFilter = "all";
+        let selectedGameForBooking = null;
+
+        // ======================== NAVIGATION (გვერდების შეცვლა) ========================
+        function navigateTo(pageName) {
+            // დამალე ყველა გვერდი
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            // აჩვენე არჩეული
+            document.getElementById(`${pageName}-page`).classList.add('active');
+            
+            // განაახლე ნავიგაციის აქტიური სტატუსი (desktop)
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active');
+                if(link.getAttribute('data-page') === pageName) {
+                    link.classList.add('active');
+                }
+            });
+            // მობილური მენიუსთვის
+            document.querySelectorAll('.nav-link-mobile').forEach(link => {
+                if(link.getAttribute('data-page') === pageName) {
+                    link.style.color = '#a855f7';
+                } else {
+                    link.style.color = '#d1d5db';
+                }
+            });
+            
+            // დახურე მობილური მენიუ
+            const mobileMenu = document.getElementById('mobileMenu');
+            if(mobileMenu) mobileMenu.classList.add('hidden');
+            
+            // თუ კატალოგი გაიხსნა, განაახლე
+            if(pageName === 'catalog') renderCatalog();
+            if(pageName === 'orders') renderOrders();
+            
+            // scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // ======================== CATALOG FUNCTIONS ========================
+        function renderCatalog() {
+            const filtered = activeFilter === "all" ? gamesDB : gamesDB.filter(g => g.category === activeFilter);
+            const container = document.getElementById('gamesGrid');
+            if(!container) return;
+            container.innerHTML = filtered.map(game => `
+                <div class="glass-card rounded-[32px] p-5 card-hover transition-all duration-500 group border border-white/10">
+                    <div class="relative overflow-hidden rounded-[24px] mb-6 aspect-square shadow-2xl">
+                        <img src="${game.image}" class="w-full h-full object-cover group-hover:scale-110 transition duration-700" onerror="this.src='https://placehold.co/600x400?text=Game'">
+                        <div class="absolute top-4 left-4 bg-black/60 backdrop-blur-lg px-4 py-1.5 rounded-full text-[10px] font-black uppercase text-purple-300">${game.popular ? '🔥 ჰიტი' : 'NEW'}</div>
+                    </div>
+                    <div class="flex justify-between items-start mb-4">
+                        <div><h3 class="text-xl font-bold text-white mb-1">${game.name}</h3><p class="text-xs text-gray-500 uppercase font-black">${game.category} • ${game.players} მოთ.</p></div>
+                        <span class="text-purple-400 font-black text-xl">${game.price}₾</span>
+                    </div>
+                    <button onclick="selectGame('${game.name}', ${game.price})" class="w-full py-4 rounded-2xl bg-white/5 border border-white/10 text-white font-bold text-sm group-hover:bg-purple-600 group-hover:border-purple-600 transition-all">
+                        🎯 ამ თამაშის შეკვეთა
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        window.selectGame = (name, price) => {
+            selectedGameForBooking = { name, price };
+            localStorage.setItem('selectedGameForBooking', JSON.stringify({ name, price }));
+            navigateTo('booking');
+            // დააყენე select-ის მნიშვნელობა
+            setTimeout(() => {
+                const select = document.getElementById('gameToOrder');
+                if(select) select.value = name;
+            }, 100);
+        };
+
+        // ======================== BOOKING FORM ========================
+        function populateGameDropdown() {
+            const select = document.getElementById('gameToOrder');
+            if(select) {
+                select.innerHTML = '<option value="">🎲 აირჩიე თამაში</option>' + gamesDB.map(g => `<option value="${g.name}">${g.name} (${g.price}₾)</option>`).join('');
+            }
+        }
+
+        const bookingForm = document.getElementById('bookingForm');
+        if(bookingForm) {
+            bookingForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const fullName = document.getElementById('fullName').value.trim();
+                const email = document.getElementById('email').value.trim();
+                const date = document.getElementById('date').value;
+                const time = document.getElementById('time').value;
+                const guests = document.getElementById('guests').value;
+                const game = document.getElementById('gameToOrder').value;
+                const cardNumber = document.getElementById('cardNumber').value.trim();
+                
+                if(!fullName || !email || !date || !cardNumber || cardNumber.length < 8) {
+                    document.getElementById('bookingMessage').innerHTML = '<span class="text-red-400">❌ შეავსე ყველა ველი</span>';
+                    return;
+                }
+                
+                const gamePrice = gamesDB.find(g => g.name === game)?.price || 0;
+                const newBooking = {
+                    id: Date.now(),
+                    fullName, email, date, time, guests,
+                    game: game || "არ არის არჩეული",
+                    price: gamePrice,
+                    status: "✅ დადასტურებული",
+                    createdAt: new Date().toLocaleString()
+                };
+                
+                let bookings = JSON.parse(localStorage.getItem('paradise_bookings') || '[]');
+                bookings.unshift(newBooking);
+                localStorage.setItem('paradise_bookings', JSON.stringify(bookings));
+                localStorage.removeItem('selectedGameForBooking');
+                
+                document.getElementById('bookingMessage').innerHTML = '<span class="text-green-400">🎉 ჯავშანი წარმატებით დასრულდა!</span>';
+                bookingForm.reset();
+                updateCartCount();
+                setTimeout(() => {
+                    navigateTo('orders');
+                    renderOrders();
+                }, 1500);
+            });
+        }
+
+        // ======================== ORDERS FUNCTIONS ========================
+        function renderOrders() {
+            const container = document.getElementById('ordersContainer');
+            const bookings = JSON.parse(localStorage.getItem('paradise_bookings') || '[]');
+            if(bookings.length === 0) {
+                container.innerHTML = `<div class="col-span-2 text-center text-gray-500 py-16 glass-card rounded-3xl">📭 ჯერ არ გაქვთ დაჯავშნილი მაგიდა</div>`;
+                return;
+            }
+            container.innerHTML = bookings.map(b => `
+                <div class="glass-card rounded-3xl p-6 border-l-8 border-purple-500 shadow-2xl">
+                    <div class="flex justify-between items-start">
+                        <div><h3 class="text-2xl font-bold text-white">${b.fullName}</h3><p class="text-purple-300 text-sm">${b.email}</p></div>
+                        <span class="bg-green-500/20 text-green-400 px-3 py-1 rounded-full text-xs font-black">${b.status}</span>
+                    </div>
+                    <div class="mt-4 grid grid-cols-2 gap-3 text-sm">
+                        <p><i class="far fa-calendar-alt text-purple-400 mr-2"></i>${b.date} ${b.time}</p>
+                        <p><i class="fas fa-users text-purple-400 mr-2"></i>${b.guests} ადამიანი</p>
+                        <p class="col-span-2"><i class="fas fa-dice-d6 text-pink-400 mr-2"></i>თამაში: <strong class="text-white">${b.game}</strong></p>
+                        ${b.price ? `<p><i class="fas fa-tag text-purple-400 mr-2"></i>გადახდილი: ${b.price}₾</p>` : ''}
+                    </div>
+                    <div class="mt-4 text-xs text-gray-500 border-t border-white/10 pt-3">ID: ${b.id} • ${b.createdAt || ''}</div>
+                </div>
+            `).join('');
+        }
+
+        function updateCartCount() {
+            let bookings = JSON.parse(localStorage.getItem('paradise_bookings') || '[]');
+            const cartSpan = document.getElementById('cartCount');
+            if(cartSpan) cartSpan.innerText = bookings.length;
+        }
+
+        // ======================== FILTERS ========================
+        function initFilters() {
+            const filterBtns = document.querySelectorAll('.filter-btn');
+            filterBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    activeFilter = btn.getAttribute('data-filter');
+                    renderCatalog();
+                    filterBtns.forEach(b => {
+                        b.classList.remove('bg-purple-600', 'text-white');
+                        b.classList.add('glass', 'text-gray-300');
+                    });
+                    btn.classList.add('bg-purple-600', 'text-white');
+                    btn.classList.remove('glass', 'text-gray-300');
+                });
+            });
+        }
+
+        // ======================== BURGER MENU ========================
+        const menuBtn = document.getElementById('menuBtn');
+        const mobileMenu = document.getElementById('mobileMenu');
+        if(menuBtn && mobileMenu) {
+            menuBtn.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+        }
+
+        // ======================== SCROLL EFFECT ========================
+        window.addEventListener('scroll', () => {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('py-2', 'bg-[#0b0712]/95');
+                navbar.classList.remove('py-3');
+            } else {
+                navbar.classList.remove('py-2', 'bg-[#0b0712]/95');
+                navbar.classList.add('py-3');
+            }
+        });
+
+        // ======================== CHECK SELECTED GAME FROM CATALOG ========================
+        const savedGame = localStorage.getItem('selectedGameForBooking');
+        if(savedGame) {
+            const game = JSON.parse(savedGame);
+            selectedGameForBooking = game;
+            setTimeout(() => {
+                const select = document.getElementById('gameToOrder');
+                if(select) select.value = game.name;
+            }, 100);
+        }
+
+        // ======================== INIT ========================
+        renderCatalog();
+        populateGameDropdown();
+        renderOrders();
+        updateCartCount();
+        initFilters();
+        
+        // desktop nav links-ის data-page ატრიბუტების დაყენება
+        document.querySelectorAll('.nav-link').forEach((link, idx) => {
+            const pages = ['home', 'catalog', 'booking', 'orders'];
+            if(link.getAttribute('data-page') === null) {
+                link.setAttribute('data-page', pages[idx]);
+            }
+        });
+        document.querySelectorAll('.nav-link-mobile').forEach((link, idx) => {
+            const pages = ['home', 'catalog', 'booking', 'orders'];
+            if(link.getAttribute('data-page') === null) {
+                link.setAttribute('data-page', pages[idx]);
+            }
+        });
+    </script>
+</body>
+</html>
