@@ -52,11 +52,26 @@
         html {
             scroll-behavior: smooth;
         }
+        /* Mobile menu styles */
+        .mobile-menu {
+            transition: transform 0.3s ease-in-out, opacity 0.3s ease;
+            transform: translateX(100%);
+            opacity: 0;
+            visibility: hidden;
+        }
+        .mobile-menu.open {
+            transform: translateX(0);
+            opacity: 1;
+            visibility: visible;
+        }
+        body.menu-open {
+            overflow: hidden;
+        }
     </style>
 </head>
 <body class="antialiased overflow-x-hidden">
 
-    <!-- ======================== NAVBAR (არ ჭედავს) ======================== -->
+    <!-- ======================== NAVBAR ======================== -->
     <nav class="fixed w-full z-50 glass border-b border-white/5 px-4 md:px-8 py-3 transition-all duration-300" id="navbar">
         <div class="max-w-7xl mx-auto flex justify-between items-center">
             <div class="flex items-center gap-3 cursor-pointer group" onclick="scrollToSection('home')">
@@ -66,10 +81,11 @@
                 <span class="text-2xl font-black tracking-tighter text-white uppercase">Paradise</span>
             </div>
             
+            <!-- Desktop Navigation -->
             <div class="hidden md:flex items-center gap-8 text-sm font-semibold uppercase tracking-widest">
                 <a href="#" onclick="scrollToSection('home'); return false;" class="nav-link hover:text-purple-400 transition-colors" data-section="home">მთავარი</a>
                 <a href="#" onclick="scrollToSection('catalog'); return false;" class="nav-link hover:text-purple-400 transition-colors" data-section="catalog">კატალოგი</a>
-                <a href="#" onclick="scrollToSection('booking'); return false;" class="nav-link hover:text-purple-400 transition-colors text-purple-400" data-section="booking">დაჯავშნა</a>
+                <a href="#" onclick="scrollToSection('booking'); return false;" class="nav-link hover:text-purple-400 transition-colors" data-section="booking">დაჯავშნა</a>
                 <a href="#" onclick="scrollToSection('my-orders'); return false;" class="nav-link hover:text-purple-400 transition-colors" data-section="my-orders">ჩემი შეკვეთები</a>
             </div>
 
@@ -81,10 +97,36 @@
                 <button onclick="scrollToSection('booking')" class="hidden sm:block px-6 py-2.5 rounded-full bg-white text-black font-bold hover:bg-purple-500 hover:text-white transition-all duration-300 shadow-xl">
                     დაჯავშნე NOW
                 </button>
-                <i class="fas fa-bars text-2xl md:hidden cursor-pointer"></i>
+                <!-- Mobile Menu Toggle Button -->
+                <button id="menuToggleBtn" class="md:hidden text-2xl cursor-pointer focus:outline-none hover:text-purple-400 transition">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Mobile Menu Panel -->
+        <div id="mobileMenuPanel" class="fixed top-0 right-0 w-64 h-full glass-card border-l border-purple-500/30 z-50 mobile-menu shadow-2xl">
+            <div class="flex justify-end p-4">
+                <button id="closeMenuBtn" class="text-white text-2xl hover:text-purple-400 transition">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="flex flex-col items-start gap-6 px-6 py-4 text-sm font-semibold uppercase tracking-widest">
+                <a href="#" onclick="scrollToSection('home'); closeMobileMenu(); return false;" class="nav-link mobile-nav-link hover:text-purple-400 transition-colors w-full py-2" data-section="home">მთავარი</a>
+                <a href="#" onclick="scrollToSection('catalog'); closeMobileMenu(); return false;" class="nav-link mobile-nav-link hover:text-purple-400 transition-colors w-full py-2" data-section="catalog">კატალოგი</a>
+                <a href="#" onclick="scrollToSection('booking'); closeMobileMenu(); return false;" class="nav-link mobile-nav-link hover:text-purple-400 transition-colors w-full py-2 text-purple-400" data-section="booking">დაჯავშნა</a>
+                <a href="#" onclick="scrollToSection('my-orders'); closeMobileMenu(); return false;" class="nav-link mobile-nav-link hover:text-purple-400 transition-colors w-full py-2" data-section="my-orders">ჩემი შეკვეთები</a>
+                <div class="pt-4 w-full">
+                    <button onclick="scrollToSection('booking'); closeMobileMenu();" class="w-full py-3 rounded-full custom-gradient text-white font-bold text-sm">
+                        დაჯავშნე NOW
+                    </button>
+                </div>
             </div>
         </div>
     </nav>
+
+    <!-- Overlay for mobile menu -->
+    <div id="mobileOverlay" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-40 hidden transition-all duration-300"></div>
 
     <!-- ======================== HERO ======================== -->
     <section id="home" class="relative min-h-screen flex items-center justify-center pt-20">
@@ -217,6 +259,36 @@
     </footer>
 
     <script>
+        // ---------- MOBILE MENU FUNCTIONALITY ----------
+        const menuToggleBtn = document.getElementById('menuToggleBtn');
+        const closeMenuBtn = document.getElementById('closeMenuBtn');
+        const mobileMenu = document.getElementById('mobileMenuPanel');
+        const overlay = document.getElementById('mobileOverlay');
+        
+        function openMobileMenu() {
+            mobileMenu.classList.add('open');
+            overlay.classList.remove('hidden');
+            document.body.classList.add('menu-open');
+        }
+        
+        function closeMobileMenu() {
+            mobileMenu.classList.remove('open');
+            overlay.classList.add('hidden');
+            document.body.classList.remove('menu-open');
+        }
+        
+        if (menuToggleBtn) {
+            menuToggleBtn.addEventListener('click', openMobileMenu);
+        }
+        if (closeMenuBtn) {
+            closeMenuBtn.addEventListener('click', closeMobileMenu);
+        }
+        if (overlay) {
+            overlay.addEventListener('click', closeMobileMenu);
+        }
+        
+        window.closeMobileMenu = closeMobileMenu;
+        
         // ---------- GAMES DATABASE ----------
         const gamesDB = [
             { id: 1, name: "Catan: Universe", category: "strategy", players: "3-4", price: 15, image: "https://images.unsplash.com/photo-1611996575749-79a3a250f948?auto=format&fit=crop&q=80&w=600", popular: true },
@@ -373,7 +445,7 @@
             }
         }
         
-        // SCROLL FUNCTION - არ ჭედავს, მხოლოდ გლუვი სკროლი
+        // SCROLL FUNCTION - გლუვი სკროლი
         window.scrollToSection = (sectionId) => {
             const element = document.getElementById(sectionId);
             if(element) {
@@ -386,6 +458,7 @@
                     link.classList.add('active', 'text-purple-400');
                 }
             });
+            closeMobileMenu();
         };
         
         // navbar scroll effect
@@ -403,9 +476,20 @@
         
         // ნავიგაციის საწყისი მდგომარეობა
         document.querySelectorAll('.nav-link').forEach(link => {
-            link.setAttribute('data-section', link.innerText.trim().toLowerCase() === 'მთავარი' ? 'home' : 
-                (link.innerText.trim().toLowerCase() === 'კატალოგი' ? 'catalog' :
-                (link.innerText.trim().toLowerCase() === 'დაჯავშნა' ? 'booking' : 'my-orders')));
+            const text = link.innerText.trim().toLowerCase();
+            if(text === 'მთავარი') link.setAttribute('data-section', 'home');
+            else if(text === 'კატალოგი') link.setAttribute('data-section', 'catalog');
+            else if(text === 'დაჯავშნა') link.setAttribute('data-section', 'booking');
+            else if(text === 'ჩემი შეკვეთები') link.setAttribute('data-section', 'my-orders');
+        });
+        
+        // Set active class for mobile nav links as well
+        document.querySelectorAll('.mobile-nav-link').forEach(link => {
+            const text = link.innerText.trim().toLowerCase();
+            if(text === 'მთავარი') link.setAttribute('data-section', 'home');
+            else if(text === 'კატალოგი') link.setAttribute('data-section', 'catalog');
+            else if(text === 'დაჯავშნა') link.setAttribute('data-section', 'booking');
+            else if(text === 'ჩემი შეკვეთები') link.setAttribute('data-section', 'my-orders');
         });
     </script>
 </body>
